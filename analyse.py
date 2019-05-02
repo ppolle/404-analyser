@@ -2,12 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 
 class Crawl:
-    def crawl(self):
-        self.base_url = 'http://devhubafrika.org/'
+    def __init__(self, base_url):
+        self.base_url = base_url
         self.links = [self.base_url]
         self.broken_links = []
         self.visited_links = []
 
+    def crawl(self):
+        
         for link in self.links:
             self.analysis(link)
 
@@ -54,6 +56,6 @@ class Crawl:
         for link in self.broken_links:
             print(link)
 
-run = Crawl()
+run = Crawl('https://pymbook.readthedocs.io/en/latest/classes.html')
 run.crawl()
 run.complete()  
