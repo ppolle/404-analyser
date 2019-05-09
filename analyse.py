@@ -1,4 +1,5 @@
 import requests
+import logging
 from bs4 import BeautifulSoup
 
 class Crawl:
@@ -7,6 +8,8 @@ class Crawl:
         self.links = [self.base_url]
         self.broken_links = []
         self.visited_links = []
+
+        logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
     def crawl(self):
         
@@ -43,8 +46,7 @@ class Crawl:
             self.broken_links.append(link)
 
     def analysis(self, link):
-
-        print('Analysing link:' + link)
+        logging.info('Analysing link:' + link)
         response = requests.get(link)
         if response.status_code == 200:
             self.update_visited_links(link)
@@ -54,23 +56,18 @@ class Crawl:
             self.update_broken_links(link)      
 
     def complete(self):
-        print('Operation completed. {} urls analysed.{} broken links found as outlined below:'.format(len(self.visited_links), len(self.broken_links)))
+        logging.error('Operation completed. {} urls analysed.{} broken links found as outlined below:'.format(len(self.visited_links), len(self.broken_links)))
         for link in self.broken_links:
             print(link)
 
 if __name__ == '__main__':
     import argparse
-    parser = argparse.ArgumentParser(description="Finds broken links on your website. Learn more at: https://github.com/bahe007/tt404")
+    parser = argparse.ArgumentParser(description="Finds broken links on a website.")
     parser.add_argument('base_url', type=str,
                         help='The base url where the crawler should start')
 
     arguments = parser.parse_args()
     address = arguments.base_url 
-    # import sys
-    # if len(sys.argv) > 1:
-    #     address = ' '.join(sys.argv[1:])
-    # else:
-    #     address = 'https://pymbook.readthedocs.io/en/latest/classes.html'
 
     run = Crawl(address)
     run.crawl()
