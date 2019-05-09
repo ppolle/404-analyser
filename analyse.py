@@ -11,7 +11,8 @@ class Crawl:
     def crawl(self):
         
         for link in self.links:
-            self.analysis(link)
+            if link not in self.visited_links:
+                self.analysis(link)
 
     def get_links(self, content):
         soup = BeautifulSoup(content, 'html.parser')
@@ -42,6 +43,7 @@ class Crawl:
             self.broken_links.append(link)
 
     def analysis(self, link):
+
         print('Analysing link:' + link)
         response = requests.get(link)
         if response.status_code == 200:
@@ -56,6 +58,20 @@ class Crawl:
         for link in self.broken_links:
             print(link)
 
-run = Crawl('https://pymbook.readthedocs.io/en/latest/classes.html')
-run.crawl()
-run.complete()  
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description="Finds broken links on your website. Learn more at: https://github.com/bahe007/tt404")
+    parser.add_argument('base_url', type=str,
+                        help='The base url where the crawler should start')
+
+    arguments = parser.parse_args()
+    address = arguments.base_url 
+    # import sys
+    # if len(sys.argv) > 1:
+    #     address = ' '.join(sys.argv[1:])
+    # else:
+    #     address = 'https://pymbook.readthedocs.io/en/latest/classes.html'
+
+    run = Crawl(address)
+    run.crawl()
+    run.complete()  
