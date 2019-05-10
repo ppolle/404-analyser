@@ -3,6 +3,9 @@ import requests
 import logging
 from bs4 import BeautifulSoup
 
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 class Crawl:
     def __init__(self, base_url):
         self.base_url = base_url
@@ -10,9 +13,7 @@ class Crawl:
         self.broken_links = []
         self.visited_links = []
 
-        logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
-
-        # Create target Directory if don't exist
+        # Create target Directory to save broken links csv file's if don't exist
         if not os.path.exists('Broken Links'):
             os.mkdir('Broken Links')
 
@@ -22,7 +23,8 @@ class Crawl:
             if link not in self.visited_links:
                 self.analysis(link)
 
-    def get_links(self, content):
+    def get_links(self, content, link):
+        logger.info('Parsing:' + link + ', for more links')
         soup = BeautifulSoup(content, 'html.parser')
         links = soup.find_all('a')
 
@@ -51,11 +53,11 @@ class Crawl:
             self.broken_links.append(link)
 
     def analysis(self, link):
-        logging.info('Analysing link:' + link)
+        logger.info('Analysing link:' + link)
         response = requests.get(link)
         if response.status_code == 200:
             self.update_visited_links(link)
-            self.get_links(response.content)
+            self.get_links(response.content, link)
         else:
             self.update_visited_links(link)
             self.update_broken_links(link)      
@@ -64,13 +66,14 @@ class Crawl:
         import csv
 
         print('')
-        logging.info('Operation completed. {} urls analysed.{} broken links found as outlined in the csv file'.format(len(self.visited_links), len(self.broken_links)))
+        logger.info('Operation completed. {} urls analysed.{} broken links found as outlined in the csv file'.format(len(self.visited_links), len(self.broken_links)))
         
-        with open('broken_lins_csv/{}.csv'.format(self.base_url), "w") as csvfile:
-            writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            writer.writerow(["Broken Links"])
-            for link in self.broken_links:
-                writer.writerow([link])
+        if self.broken_links > 0:
+            with open('Broken Links/{}.csv'.format(self.base_url), "w") as csvfile:
+                writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                writer.writerow(["Broken Links"])
+                for link in self.broken_links:
+                    writer.writerow([link])
 
 if __name__ == '__main__':
     import argparse
