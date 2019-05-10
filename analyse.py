@@ -1,3 +1,4 @@
+import os
 import requests
 import logging
 from bs4 import BeautifulSoup
@@ -10,6 +11,10 @@ class Crawl:
         self.visited_links = []
 
         logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+        # Create target Directory if don't exist
+        if not os.path.exists('Broken Links'):
+            os.mkdir('Broken Links')
 
     def crawl(self):
         
@@ -56,9 +61,16 @@ class Crawl:
             self.update_broken_links(link)      
 
     def complete(self):
-        logging.error('Operation completed. {} urls analysed.{} broken links found as outlined below:'.format(len(self.visited_links), len(self.broken_links)))
-        for link in self.broken_links:
-            print(link)
+        import csv
+
+        print('')
+        logging.info('Operation completed. {} urls analysed.{} broken links found as outlined in the csv file'.format(len(self.visited_links), len(self.broken_links)))
+        
+        with open('broken_lins_csv/{}.csv'.format(self.base_url), "w") as csvfile:
+            writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            writer.writerow(["Broken Links"])
+            for link in self.broken_links:
+                writer.writerow([link])
 
 if __name__ == '__main__':
     import argparse
