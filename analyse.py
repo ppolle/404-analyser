@@ -1,4 +1,3 @@
-import os
 import logging
 import requests
 import tldextract
@@ -15,10 +14,6 @@ class Crawl:
         self.links = [self.base_url]
         self.broken_links = []
         self.visited_links = []
-
-        # Create target Directory to save broken links csv file's if don't exist
-        if not os.path.exists('Broken Links'):
-            os.mkdir('Broken Links')
 
     def crawl(self):
         '''
@@ -119,6 +114,7 @@ class Crawl:
         '''
         Saves all broken links into a csv file and saves the file in the 'Broken Links' folder
         '''
+        import os
         import csv
 
         print('')
@@ -127,6 +123,11 @@ class Crawl:
 
         try:
             if len(self.broken_links) > 0:
+                # Create target Directory to save broken links csv file's if don't exist
+                if not os.path.exists('Broken Links'):
+                    os.mkdir('Broken Links')
+
+                #Create csv file    
                 with open('Broken Links/{}.csv'.format(tldextract.extract(self.base_url).domain), "w") as csvfile:
                     writer = csv.writer(
                         csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
