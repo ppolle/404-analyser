@@ -59,15 +59,6 @@ class Crawl:
                 link = self.base_url
             else:
                 link = urlparse.urljoin(self.base_url, link)
-        # if link.startwith('')not self.check_tlf(link)
-
-        # if link.startswith('/'):
-        #     link = self.base_url + link[1:]
-
-       
-
-        # if base_tld not in link:
-        #     link = self.base_url + link
 
         return link
 
