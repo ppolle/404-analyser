@@ -47,12 +47,18 @@ class Crawl:
         '''
         Sanitizes the link
         '''
-        if link == '/':
-            link = self.base_url
+        import re
+        import urlparse
 
-        if link == '#':
-            link = self.base_url
+        relative_url = re.compile(r"""^(?!www\.|(?:http|ftp)s?://|[A-Za-z]:\\|//).*""", re.X)
 
+        if relative_url.search(link):
+            if link == '/':
+                link = self.base_url
+            elif link == '#':
+                link = self.base_url
+            else:
+                link = urlparse.urljoin(self.base_url, link)
         # if link.startwith('')not self.check_tlf(link)
 
         # if link.startswith('/'):
