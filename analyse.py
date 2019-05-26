@@ -48,8 +48,11 @@ class Crawl:
         Sanitizes the link
         '''
         import re
-        import urlparse
-
+        try:
+            from urlparse import urljoin
+        except ImportError:
+            from urllib.parse import urljoin
+        
         relative_url = re.compile(r"""^(?!www\.|(?:http|ftp)s?://|[A-Za-z]:\\|//).*""", re.X)
 
         if relative_url.search(link):
@@ -58,7 +61,7 @@ class Crawl:
             elif link == '#':
                 link = self.base_url
             else:
-                link = urlparse.urljoin(self.base_url, link)
+                link = urljoin(self.base_url, link)
 
         return link
 
@@ -134,8 +137,7 @@ class Crawl:
         except Exception as e:
             logger.error(e)
 
-
-if __name__ == '__main__':
+def main():
     import argparse
     parser = argparse.ArgumentParser(
         description="Finds broken links on a website.")
@@ -148,3 +150,7 @@ if __name__ == '__main__':
     run = Crawl(address)
     run.crawl()
     run.complete()
+
+if __name__ == '__main__':
+    main()
+    
